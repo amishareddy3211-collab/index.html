@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - Riya Spa</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;background:#0f0f0f;color:#fff;min-height:100vh;padding:20px}
+.box{max-width:500px;margin:0 auto;background:#1a1a1a;border-radius:24px;padding:26px;border:1px solid #333}
+h1{letter-spacing:3px;font-size:22px;text-align:center}h1 span{color:#D9FF66}
+.label{font-size:10px;font-weight:800;color:#888;letter-spacing:1.5px;margin:18px 0 8px;display:block;text-transform:uppercase}
+.input{width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid #333;background:#111;color:#fff;font-size:14px;outline:none}
+.input:focus{border-color:#D9FF66}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{width:100%;padding:16px;background:#D9FF66;color:#111;border:none;border-radius:12px;font-weight:800;font-size:14px;margin-top:20px;cursor:pointer}
+.ok{background:#111;border:1px solid #2a2a2a;padding:12px;border-radius:12px;text-align:center;color:#D9FF66;font-weight:700;margin-top:12px;display:none}
+.small{font-size:11px;color:#666;text-align:center;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="box">
+<h1>ADMIN <span>FIREBASE</span></h1>
+<p style="text-align:center;font-size:11px;color:#666;margin-top:6px">SONALI BOOKING - LIVE CONFIG</p>
+
+<span class="label">UPI ID</span><input id="upi" class="input" placeholder="sonali-5411@ptyes">
+<span class="label">Telegram Username (without @)</span><input id="tgUser" class="input" placeholder="Sonal_0101">
+<span class="label">Display Name</span><input id="tgName" class="input" placeholder="SONALI SHARMA">
+<span class="label">Bot Token</span><input id="botToken" class="input" placeholder="8791716212:...">
+<span class="label">Chat ID</span><input id="chatId" class="input" placeholder="8997697799">
+
+<span class="label">PRICE SETTINGS</span>
+<div class="grid">
+<div><span class="label">1 Hour Price</span><input id="p1" class="input" type="number"></div>
+<div><span class="label">2 Hours Price</span><input id="p2" class="input" type="number"></div>
+<div><span class="label">3 Hours Price</span><input id="p3" class="input" type="number"></div>
+<div><span class="label">Full Night Price</span><input id="p4" class="input" type="number"></div>
+<div><span class="label">Full Day Price</span><input id="p5" class="input" type="number"></div>
+<div><span class="label">Advance Per Adult</span><input id="adv" class="input" type="number"></div>
+</div>
+
+<button class="btn" id="saveBtn">SAVE TO FIREBASE</button>
+<div class="ok" id="ok">✅ Saved! Website is now live updated for all users!</div>
+<div class="small">Firebase Project: sonali-booking<br>Collection: config / Document: main</div>
+<a href="index.html" style="display:block;text-align:center;margin-top:16px;color:#D9FF66;text-decoration:none;font-weight:700;font-size:12px">→ GO TO WEBSITE</a>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCaiUaTypvKoQXsyAlWtwfnxrPxQGZm2zg",
+  authDomain: "sonali-booking.firebaseapp.com",
+  databaseURL: "https://sonali-booking-default-rtdb.firebaseio.com",
+  projectId: "sonali-booking",
+  storageBucket: "sonali-booking.firebasestorage.app",
+  messagingSenderId: "296739963642",
+  appId: "1:296739963642:web:6a284faac6faa6db163f43",
+  measurementId: "G-0H4DX9Z1MT"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const docRef = doc(db, "config", "main");
+
+const defaults={upi:'sonali-5411@ptyes',tgUser:'Sonal_0101',tgName:'SONALI SHARMA',botToken:'8791716212:AAG8Rwj1OOg_rmWljehqWfFM5S0SEB5ogMI',chatId:'8997697799',p1:2000,p2:3000,p3:4000,p4:6000,p5:6000,adv:300};
+
+async function load(){
+ try{
+  const snap=await getDoc(docRef);
+  const c=snap.exists()?snap.data():defaults;
+  document.getElementById('upi').value=c.upi;
+  document.getElementById('tgUser').value=c.tgUser;
+  document.getElementById('tgName').value=c.tgName;
+  document.getElementById('botToken').value=c.botToken;
+  document.getElementById('chatId').value=c.chatId;
+  document.getElementById('p1').value=c.p1;
+  document.getElementById('p2').value=c.p2;
+  document.getElementById('p3').value=c.p3;
+  document.getElementById('p4').value=c.p4;
+  document.getElementById('p5').value=c.p5;
+  document.getElementById('adv').value=c.adv;
+ }catch(e){alert('Error loading: '+e.message)}
+}
+
+document.getElementById('saveBtn').onclick=async()=>{
+ const data={
+  upi:document.getElementById('upi').value.trim(),
+  tgUser:document.getElementById('tgUser').value.trim(),
+  tgName:document.getElementById('tgName').value.trim(),
+  botToken:document.getElementById('botToken').value.trim(),
+  chatId:document.getElementById('chatId').value.trim(),
+  p1:parseInt(document.getElementById('p1').value)||2000,
+  p2:parseInt(document.getElementById('p2').value)||3000,
+  p3:parseInt(document.getElementById('p3').value)||4000,
+  p4:parseInt(document.getElementById('p4').value)||6000,
+  p5:parseInt(document.getElementById('p5').value)||6000,
+  adv:parseInt(document.getElementById('adv').value)||300
+ };
+ await setDoc(docRef,data);
+ document.getElementById('ok').style.display='block';
+ setTimeout(()=>document.getElementById('ok').style.display='none',3000);
+};
+load();
+</script>
+</body>
+</html>
